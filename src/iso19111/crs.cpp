@@ -946,6 +946,41 @@ bool CRS::mustAxisOrderBeSwitchedForVisualization() const {
     return false;
 }
 
+const std::vector<cs::CoordinateSystemAxisNNPtr> CRS::getAxisList() const {
+    if (const CompoundCRS *compoundCRS =
+            dynamic_cast<const CompoundCRS *>(this)) {
+        const auto &comps = compoundCRS->componentReferenceSystems();
+        if (!comps.empty()) {
+            return comps[0]->getAxisList();
+        }
+    }
+
+    if (const GeographicCRS *geogCRS =
+            dynamic_cast<const GeographicCRS *>(this)) {
+        return geogCRS->coordinateSystem()->axisList();
+    }
+
+    if (const ProjectedCRS *projCRS =
+            dynamic_cast<const ProjectedCRS *>(this)) {
+        return projCRS->coordinateSystem()->axisList();
+    }
+
+    if (const DerivedProjectedCRS *derivedProjCRS =
+            dynamic_cast<const DerivedProjectedCRS *>(this)) {
+        return derivedProjCRS->coordinateSystem()->axisList();
+    }
+
+    if (const BoundCRS *boundCRS = dynamic_cast<const BoundCRS *>(this)) {
+        return boundCRS->baseCRS().get()->getAxisList();
+    }
+
+    if (const SingleCRS *singleCRS = dynamic_cast<const SingleCRS *>(this)) {
+        return singleCRS->coordinateSystem()->axisList();
+    }
+
+    return {};
+}
+
 //! @endcond
 
 // ---------------------------------------------------------------------------
@@ -3376,6 +3411,7 @@ void GeographicCRS::_exportToPROJString(
             addDatumInfoToPROJString(formatter);
         }
     }
+
     if (!formatter->getCRSExport()) {
         addAngularUnitConvertAndAxisSwap(formatter);
     }

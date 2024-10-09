@@ -143,6 +143,9 @@ class PROJ_GCC_DLL CRS : public common::ObjectUsage,
 
     PROJ_INTERNAL bool mustAxisOrderBeSwitchedForVisualization() const;
 
+    PROJ_INTERNAL const std::vector<cs::CoordinateSystemAxisNNPtr>
+    getAxisList() const;
+
     PROJ_INTERNAL CRSNNPtr applyAxisOrderReversal(const char *nameSuffix) const;
 
     PROJ_FOR_TEST CRSNNPtr normalizeForVisualization() const;

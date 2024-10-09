@@ -8455,6 +8455,25 @@ std::string IPROJStringExportable::exportToPROJString(
         formatter->setCRSExport(true);
     }
     _exportToPROJString(formatter);
+    if (bIsCRS && !formatter->hasParam("axis")) {
+        {
+            const auto &axisList =
+                dynamic_cast<const crs::CRS *>(this)->getAxisList();
+            const auto &dir0 = axisList[0]->direction();
+            const auto &dir1 = axisList[1]->direction();
+            /*
+            formatter->addParam("axis0", dir0.toString());
+            formatter->addParam("axis1", dir1.toString());
+            */
+            if (&dir0 == &cs::AxisDirection::EAST &&
+                &dir1 == &cs::AxisDirection::NORTH) {
+                formatter->addParam("axis", "enu");
+            } else if (&dir0 == &cs::AxisDirection::NORTH &&
+                       &dir1 == &cs::AxisDirection::EAST) {
+                formatter->addParam("axis", "neu");
+            }
+        }
+    }
     if (formatter->getAddNoDefs() && bIsCRS) {
         if (!formatter->hasParam("no_defs")) {
             formatter->addParam("no_defs");
